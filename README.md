@@ -12,8 +12,8 @@ Built as a base for designing add-on parts, so the printed parts are V1's real g
 - **Measured on the machine:** 865 mm rails (corner to corner), 90 mm legs, and the lower rails'
   underside 117 mm above the table. The model builds the frame up from that rail height, which leaves
   the leg bottoms 9.9 mm above the table inside the feet (V1 sets the legs with a block).
-- **Other tubes** follow V1's Burly cut list (`burly_calc.py`): all six X/Y tubes (rails and gantries)
-  are the rail length; the usable height is taken as leg + 13 = 103 mm, so Z rails = 103 + 190 = 293 mm.
+- **Z rails** measured at 271 mm (V1's formula: usable height 81 + 190). All six X/Y tubes (rails and
+  gantries) are the rail length, per V1's Burly cut list (`burly_calc.py`).
 - **Steppers, leadscrew, coupler and T8 nut** are simple stand-ins. Bolts, bearings and belts are not drawn.
   Neither is a spindle; the tool mount is the last part on the Z axis.
 
@@ -39,28 +39,29 @@ assembly photos (docs.v1e.com, Burly section):
 | Tool Mount | rail cups on the Z rails, bottom flush with the rail bottoms (its screws land 22.5 and 97.5 mm up) |
 | Nut Trap (x2) | inside the Z rails, nuts at 22.5 and 97.5 mm |
 
-Less certain: the Z rail length (293 mm assumed from V1's formula, not measured), the gap between Z Motor and Z Lower (set by your coupler, `z_mount_gap` = 10 mm), and the
+Less certain: the gap between Z Motor and Z Lower (set by your coupler, `z_mount_gap` = 10 mm), and the
 spin of the gantry spacers about bolt B.
 
-## Findings (865 mm rails, 90 mm legs, lower rails 117 mm up)
+## Findings (865 mm rails, 90 mm legs, 271 mm Z rails, lower rails 117 mm up)
 
 - **Heights:** leg bottom 9.9, lock top 106.9, Y rails 129.7 (underside 117), X rails 157.2,
   X gantry 167.6, Y gantry 195.1, top of the middle 238.3 mm above the table.
 - **Travel:** the gantries move 572 mm each way before the rollers meet the corners or the middle
   meets the rollers (bounding boxes, so a little conservative), against V1's 601 mm usable.
-- **Z:** with the Z rail bottoms on the table, Z Lower is 11 mm above the T8 nut, so the table, not
-  the machine, sets the lowest Z.
+- **Z:** the Z axis bottoms out with Z Lower on the T8 nut while the Z rail bottoms (and the tool
+  mount's bottom edge) are still 10.8 mm above the table. The 90 mm legs are 22 mm longer than V1's
+  68 mm for 271 mm Z rails; the 10 mm Z Motor-Z Lower gap is assumed, and a smaller gap lowers this.
 
 ## Cut list
 
 ```
-MPCNC Burly J, rails 865 x 865 mm
-usable area   601 x 601 x 103 mm
+MPCNC Burly J, as built
   3 x x_rail     865.0 mm
   3 x y_rail     865.0 mm
-  2 x z_rail     293.0 mm   (from V1's formula - measure yours)
-  4 x leg         90.0 mm   (measured)
-leadscrew     179 mm (T8)
+  2 x z_rail     271.0 mm
+  4 x leg         90.0 mm
+leadscrew     157 mm (T8, V1's usable + 76)
+usable area   601 x 601 x 81 mm (V1's figures for these rails)
 ```
 
 ## Licence and attribution

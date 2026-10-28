@@ -400,8 +400,9 @@ wcy = (yg_lo + yg_hi) / 2 + tool_dy
 
 xg = xg_lo + P["pose"]["x"] * (xg_hi - xg_lo)
 yg = yg_lo + P["pose"]["y"] * (yg_hi - yg_lo)
-zrb = P["pose"]["z"] * C["z_work"]
-assert zrb >= zrb_min, f"Z axis below its lowest position ({zrb:.1f} < {zrb_min:.1f})"
+# Lowest Z: rail bottoms on the table, or Z Lower on the T8 nut if that comes first.
+zrb_low = max(0.0, zrb_min)
+zrb = zrb_low + P["pose"]["z"] * C["z_work"]
 core, zaxis, zprims, tool = middle(xg, yg, zrb)
 
 gantry = [tube(C["x_rail"], "X gantry tube", (0, yg, z_gx), "X"),
@@ -417,7 +418,7 @@ if P.get("debug_report"):
         "work_centre": (round(wcx, 1), round(wcy, 1)),
         "z": {"leg_lift": round(leg_lift, 2), "lock_top": round(z_lt, 2), "lower_rail": round(z_lr, 2), "upper_rail": round(z_ur, 2),
               "x_gantry": round(z_gx, 2), "y_gantry": round(z_gy, 2), "xyz_top": round(z_xyz_top, 2),
-              "z_rail_bottom_min": round(zrb_min, 2)},
+              "z_rail_bottom_min": round(zrb_min, 2), "z_rail_bottom_low": round(zrb_low, 2)},
     }))
 
 model = bd.Compound(label="MPCNC Burly J", children=[
