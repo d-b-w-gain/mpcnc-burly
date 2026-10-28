@@ -232,13 +232,12 @@ def nema(centre, shaft_axis, label):
 #   65.9) ride its top; gantry saddle along Yp at (Xp 128.45, Zp 37.5) r 13.05 -> tube centre Xp 128.1.
 # RollerMount: gantry bore along Zp at (67.5, 80.22); screws at Xp 40.58 / 94.45, Zp 35.3 into the
 #   roller's holes at (Yp 118.12, Zp 10.9 / 64.11); NEMA17 boss (67.5, 124.69), motor face Zp 6.
-# XYZ: Z rail pockets (66.77 / 138.23, 86.33), T8 nut (102.5, 110.51); symmetric about Xp 102.5,
-#   opening (front) toward -Yp; side holes for bolt B at (49.51 / 155.49, 103.53).
+# XYZ: Z rail pockets (66.77 / 138.23, 86.33), T8 nut (102.5, 110.51), centre-back hole (102.5,
+#   127.01) through a flange Zp 0-6.5, side holes (49.51 / 155.49, 103.53); symmetric about
+#   Xp 102.5, opening (front) toward -Yp.
 # Gantry Spacer: 23.03 tall on bolt B at (102.5, 97.59).
 # XY: gantry tube along Zp at (116.25, 107.2) on bearings at Yp 83.5; bolt B along Xp at
 #   (Yp 71.83, Zp 78.16) through a boss Xp 102.6-129.6, so the tube sits 35.37 from bolt B.
-#   Ears for the tension bolts at Xp 42.27 / 162.73 (tube -74 / +46.5). The X-gantry XY is upside
-#   down, so both XYs' ears sit at tube -46.5 / +74 - the XYZ mid-planes.
 # Z Motor / Z Lower: rails (66.77 / 138.23, 153.65 resp. 114.79), leadscrew 24.18 in front of them.
 # Tool Mount: rail cups (66.77 / 138.23, 91.49), front face Yp 72.5; screws 22.5 and 97.5 up.
 # Nut Trap: nuts at Xp 69.5 / 144.5, the Xp 47 end flush with the Z rail bottom.
@@ -247,7 +246,7 @@ LOCK_FLOOR = 7.0
 RAIL_STACK = 27.5
 GANTRY_ABOVE_RAIL = 128.1 - 90.18
 ROLLER_RAIL = (90.18, 110.0, 37.5)
-B_TO_TUBE = 107.2 - 71.83
+XYZ_B = (102.5, 127.01)
 Z_RAILS_M = ((66.77, 86.33), (138.23, 86.33))
 LEAD_M = (102.5, 110.51)
 TOOL_FACE_M = (102.5, 86.33 - (91.49 - 72.5))
@@ -323,62 +322,75 @@ def rollers(xg, yg):
 
 
 # ---- middle and Z axis, placed from bolt B (the middle's vertical tension bolt) ----
-# The middle is its own sub-assembly in the upper XYZ's STL frame (which happens to be square to the
-# machine: front -Y), moved so bolt B lands on the machine. Stack along B, bottom up: lower XYZ
-# (upside down, flat face up), gantry spacer, X-gantry XY stem (upside down), Y-gantry XY stem,
-# gantry spacer, upper XYZ (flat face down). Both XYZ mid-planes then sit level with the XY ears
-# (tube -46.5 / +74), which is how the parts are drawn to go together.
-XYZ_SIDE = (155.49, 103.53)        # the XYZ side hole bolt B goes through ("align it with the hole on
-XYZ_SIDE_M = (49.51, 103.53)       #  the side of the XYZ piece"); the mirror one on the lower plate
-XY_X_GANTRY = [(0, 0, -1), (0, 1, 0), (1, 0, 0)]     # stem below the tube, reaching -X from bolt B
-XY_Y_GANTRY = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]      # stem above the tube, reaching -Y from bolt B
-UPSIDE_DOWN = [(-1, 0, 0), (0, 1, 0), (0, 0, -1)]
-TURN_180 = [(-1, 0, 0), (0, -1, 0), (0, 0, 1)]       # Z plates: leadscrew behind the rails
+RM = [(S2, -S2, 0), (S2, S2, 0), (0, 0, 1)]          # middle frame: front (-Ym) faces the 0,0 corner
+RM_FLIP = [(-S2, S2, 0), (S2, S2, 0), (0, 0, -1)]     # the same, upside down about Ym
+RM_180 = [(-S2, S2, 0), (-S2, -S2, 0), (0, 0, 1)]     # turned 180 about Z (Z plates)
 zl = C["z_rail"]
 gap = P["z_mount_gap"]
-SPACER_H = 23.03
-z_xyz_lo = z_gx - 13.35 - SPACER_H                  # lower XYZ flat (top) face
-z_xyz_up = z_gy + 13.35 + SPACER_H                  # upper XYZ flat (bottom) face
-z_xyz_top = z_xyz_up + 21                           # top face of the upper XYZ
+z_xyz_top = z_gy + 43.18           # top face of the upper XYZ
 NUT_H = 3.5
 # Lowest the Z axis can go: Z Lower resting on the T8 nut flange.
 zrb_min = z_xyz_top + NUT_H - (zl - 30 - gap)
 
 
+# The red XYs: each flipped on its tube, its stem bolt through one of the XYZ side holes
+# (49.51 / 155.49, 103.53) - "align it with the hole on the side of the XYZ piece" - the X-gantry
+# XY on one, the Y-gantry XY on the other. Mesh check: no overlap with each other, the XYZs or the
+# Z rails.
+XY_X_GANTRY = [(0, 0, -1), (0, 1, 0), (1, 0, 0)]     # stem below the tube
+XY_Y_GANTRY = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]      # stem above the tube
+XY_BOLT = (116.25, 71.83, 78.16)
+XY_TUBE = (116.25, 107.2, 0)
+
+
+def _side_hole(mx, my):
+    """XYZ side hole in plan, relative to the XYZ's centre-back hole (127.01) - the middle's origin."""
+    T = frame(RM_FLIP, (*XYZ_B, 0), (0, 0, 0))
+    return apply(T, (mx, my, 0))[:2]
+
+
+SIDE_X = _side_hole(155.49, 103.53)                  # carries the X-gantry XY
+SIDE_Y = _side_hole(49.51, 103.53)                   # carries the Y-gantry XY
+# Gantry tubes relative to the middle's origin, from the XYs on those holes.
+TUBE_Y_OFF = apply(frame(XY_X_GANTRY, XY_BOLT, (*SIDE_X, 0)), XY_TUBE)[1]
+TUBE_X_OFF = apply(frame(XY_Y_GANTRY, XY_BOLT, (*SIDE_Y, 0)), XY_TUBE)[0]
+
+
 def middle(xg, yg, zrb):
-    bx, by = xg - B_TO_TUBE, yg - B_TO_TUBE
+    bx, by = xg - TUBE_X_OFF, yg - TUBE_Y_OFF
 
     def mw(mx, my, z):
-        """Upper-XYZ STL plan coordinates -> machine."""
-        return (bx + mx - XYZ_SIDE[0], by + my - XYZ_SIDE[1], z)
+        dx, dy = mx - XYZ_B[0], my - XYZ_B[1]
+        return (bx + S2 * dx + S2 * dy, by - S2 * dx + S2 * dy, z)
 
     def mf(cols, local, mxy, z):
         return frame(cols, local, mw(*mxy, z))
 
     core = [
-        ("xyz", frame(UPSIDE_DOWN, (*XYZ_SIDE_M, 0), (bx, by, z_xyz_lo)), "XYZ (lower)", A),
-        ("gantry_spacer", frame(I3, (102.5, 97.59, 0), (bx, by, z_xyz_lo)), "Gantry Spacer", A),
-        ("xy", frame(XY_X_GANTRY, (116.25, 71.83, 78.16), (bx, by, z_gx)), "XY (X gantry)", B),
-        ("xy", frame(XY_Y_GANTRY, (116.25, 71.83, 78.16), (bx, by, z_gy)), "XY (Y gantry)", B),
-        ("gantry_spacer", frame(I3, (102.5, 97.59, 0), (bx, by, z_xyz_up - SPACER_H)), "Gantry Spacer", A),
-        ("xyz", frame(I3, (*XYZ_SIDE, 0), (bx, by, z_xyz_up)), "XYZ (upper)", A),
+        ("xyz", mf(RM, (*XYZ_B, 0), XYZ_B, z_gx - 43.18), "XYZ", A),
+        ("gantry_spacer", mf(RM, (102.5, 97.59, 0), XYZ_B, z_gx - 36.68), "Gantry Spacer", A),
+        ("xy", frame(XY_X_GANTRY, XY_BOLT, (bx + SIDE_X[0], by + SIDE_X[1], z_gx)), "XY (X gantry)", B),
+        ("xy", frame(XY_Y_GANTRY, XY_BOLT, (bx + SIDE_Y[0], by + SIDE_Y[1], z_gy)), "XY (Y gantry)", B),
+        ("gantry_spacer", mf(RM_FLIP, (102.5, 97.59, 0), XYZ_B, z_gy + 36.68), "Gantry Spacer", A),
+        ("xyz", mf(RM_FLIP, (*XYZ_B, 0), XYZ_B, z_xyz_top), "XYZ", A),
     ]
     rt = zrb + zl
-    rail_mid = (102.5, 86.33)
     zaxis = [
-        ("z_motor", mf(TURN_180, (102.5, 153.65, 15), rail_mid, rt), "Z Motor", B),
-        ("z_lower", mf(TURN_180, (102.5, 114.79, 15), rail_mid, rt - 15 - gap), "Z Lower", B),
-        ("tool_mount", mf(I3, (102.5, 91.49, 0), rail_mid, zrb), "Tool Mount (M4)", B),
+        ("z_motor", mf(RM_180, (102.5, 153.65, 15), (102.5, 86.33), rt), "Z Motor", B),
+        ("z_lower", mf(RM_180, (102.5, 114.79, 15), (102.5, 86.33), rt - 15 - gap), "Z Lower", B),
+        ("tool_mount", mf(RM, (102.5, 91.49, 0), (102.5, 86.33), zrb), "Tool Mount (M4)", B),
     ]
     prims = []
     for mxy in Z_RAILS_M:
-        zaxis.append(("nut_trap", mf([(0, 0, 1), (1, 0, 0), (0, 1, 0)], (47, 102.2, 6.65), mxy, zrb),
+        zaxis.append(("nut_trap", mf([(0, 0, 1), (S2, -S2, 0), (S2, S2, 0)], (47, 102.2, 6.65), mxy, zrb),
                       "Nut Trap", A))
         prims.append(tube(zl, "Z rail", mw(*mxy, zrb + zl / 2)))
     lx_, ly_, _ = mw(*LEAD_M, 0)
     lead_top = rt - 15 - gap
+    zm = bd.Box(NEMA[0], NEMA[0], NEMA[1]).moved(bd.Location((lx_, ly_, rt + NEMA[1] / 2), (0, 0, 45)))
+    zm.label, zm.color = "Stepper NEMA17 (Z)", MOTOR
     prims += [
-        box((NEMA[0], NEMA[0], NEMA[1]), (lx_, ly_, rt + NEMA[1] / 2), "Stepper NEMA17 (Z)", MOTOR),
+        zm,
         rod(19, gap, (lx_, ly_, lead_top), "Coupler 5-8 mm", STEEL),
         rod(8, C["leadscrew"], (lx_, ly_, lead_top - C["leadscrew"]), "Leadscrew T8", STEEL),
         rod(22, NUT_H, (lx_, ly_, z_xyz_top), "T8 nut", BRASS),
