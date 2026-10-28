@@ -39,7 +39,8 @@ assembly photos (docs.v1e.com, Burly section):
 | Tool Mount | rail cups on the Z rails, bottom flush with the rail bottoms (its screws land 22.5 and 97.5 mm up) |
 | Nut Trap (x2) | inside the Z rails, nuts at 22.5 and 97.5 mm |
 
- Less certain: the gap between Z Motor and Z Lower (set by your coupler, `z_mount_gap` = 10 mm), and the
+ Known overlap: the XY ear tabs press about 1 mm (at most about 5 mm) into the edges of the XYZ plates;
+flipping the plates doesn't change it, and with both holes aligned the plates can't move. Less certain: the gap between Z Motor and Z Lower (set by your coupler, `z_mount_gap` = 10 mm), and the
 spin of the gantry spacers about bolt B.
 
 ## Findings (865 mm rails, 90 mm legs, 271 mm Z rails, lower rails 117 mm up)
