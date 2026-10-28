@@ -14,6 +14,10 @@ Built as a base for designing add-on parts, so the printed parts are V1's real g
   the leg bottoms 9.9 mm above the table inside the feet (V1 sets the legs with a block).
 - **Z rails** measured at 271 mm (V1's formula: usable height 81 + 190). All six X/Y tubes (rails and
   gantries) are the rail length, per V1's Burly cut list (`burly_calc.py`).
+- **Belt anchors** (add-on, see credits): an upper anchor on each Top Corner and a lower anchor on
+  each Bottom Corner, hooked over the corner's zip-tie bracket with the box running inboard along
+  the rail. Fitted by mesh search: the bracket sits in the anchor's pocket with only a few touching
+  points. The belt clips that slide into the anchors are not drawn.
 - **Steppers, leadscrew, coupler and T8 nut** are simple stand-ins. Bolts, bearings and belts are not drawn.
   Neither is a spindle; the tool mount is the last part on the Z axis.
 
@@ -76,6 +80,10 @@ The printed-part meshes are derived from **Mostly Printed CNC "MPCNC" BURLY J-25
 Changes from the originals: the STLs were decimated (0.35 mm vertex clustering), quantised to
 0.02 mm and repacked as `mesh_<part>.json`, and placed into an assembly by `design.py`. The cut list
 in `burly_calc.py` comes from V1's documentation.
+
+The belt anchors (`mesh_belt_anchor*.json`) are derived from **MPCNC Belt Mount/Tensioner** by
+DodgeDerek ([thing:1833934](https://www.thingiverse.com/thing:1833934)), licensed under
+[CC BY-NC](https://creativecommons.org/licenses/by-nc/4.0/); decimated and placed the same way.
 
 As required by the ShareAlike term, this whole repository is released under the same licence,
 **CC BY-NC-SA 4.0** (see `LICENSE`). This is a personal model of one machine; it is not made or

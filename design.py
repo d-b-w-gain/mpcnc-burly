@@ -274,6 +274,13 @@ T_bot = frame([(1, 0, 0), (0, 0, -1), (0, 1, 0)], (110, 128, 23.5), (0, 0, z_lt)
 T_spc = frame([(1, 0, 0), (0, 0, 1), (0, -1, 0)], (11.7, 0, 11.7), (0, 0, z_lr))
 T_top = frame([(0, 1, 0), (0, 0, 1), (1, 0, 0)], (138.5, 94.07, 23.5), (0, 0, z_ur + U_SAG - 13.0))
 
+# Add-ons the user is printing (see README for credits):
+# Belt anchors (DodgeDerek, thing:1833934): the anchor's 10 x 11.6 mm pocket hooks over the corner's
+# zip-tie bracket and the box runs inboard along the rail. Fitted by mesh search (no overlap beyond a
+# few touching points, bracket inside the pocket). Rows of R map anchor -> corner STL coordinates.
+T_ANCHOR_LOWER = ([[0, 0, 1], [0, -1, 0], [1, 0, 0]], [72.3, 89.58, 28.15])    # on Bottom Corner
+T_ANCHOR_UPPER = ([[0, 0, 1], [0, -1, 0], [1, 0, 0]], [99.3, 111.13, 25.6])    # on Top Corner
+
 corners = []
 for i, (sx, sy) in enumerate([(-1, -1), (1, -1), (1, 1), (-1, 1)]):
     M = at(0, 0)
@@ -290,6 +297,8 @@ for i, (sx, sy) in enumerate([(-1, -1), (1, -1), (1, 1), (-1, 1)]):
         part("bottom_corner", Tb, label_m("Bottom Corner", Tb), B),
         part("spacer_corner", Ts, "Spacer Corner", A),
         part("top_corner", Tt, label_m("Top Corner", Tt), B),
+        part("belt_anchor_lower", compose(Tb, T_ANCHOR_LOWER), "Belt Anchor (lower)", A),
+        part("belt_anchor", compose(Tt, T_ANCHOR_UPPER), "Belt Anchor", A),
     ]))
 
 rails = [tube(C["y_rail"], f"Y rail {'L' if s < 0 else 'R'}", (s * lx, 0, z_lr), "Y") for s in (-1, 1)]
