@@ -46,9 +46,9 @@ spin of the gantry spacers about bolt B.
 
 - **Heights:** leg bottom 9.9, lock top 106.9, Y rails 129.7 (underside 117), X rails 157.2,
   X gantry 167.6, Y gantry 195.1, top of the middle 238.3 mm above the table.
-- **Travel:** the gantries move 520 mm each way before the rollers meet the corners or the middle
+- **Travel:** the gantries move 580 mm each way before the rollers meet the corners or the middle
   meets the rollers (bounding boxes, so a little conservative), against V1's 601 mm usable.
-  The tool sits 98 mm left of and in front of the gantry crossing.
+  The tool sits 78 mm left of and in front of the gantry crossing.
 - **Z:** the Z axis bottoms out with Z Lower on the T8 nut while the Z rail bottoms (and the tool
   mount's bottom edge) are still 10.8 mm above the table. The 90 mm legs are 22 mm longer than V1's
   68 mm for 271 mm Z rails; the 10 mm Z Motor-Z Lower gap is assumed, and a smaller gap lowers this.
