@@ -32,7 +32,7 @@ assembly photos (docs.v1e.com, Burly section):
 | Top Corner | upper (X) rail in its U; its flange sits 1.5 mm above the bottom's (V1's "2 mm gap") |
 | Roller | two bearings (M8 at Xp 113.88) ride the top of the rail; gantry tube in its saddle 37.9 mm above the rail |
 | RollerMount | its bore on the gantry tube, its two screws in the roller's holes; NEMA17 on its 6 mm plate |
-| XYZ (x2) | Z rail pockets on the rails, T8 nut on the leadscrew; front toward the 0,0 corner; resting on the 23 mm gantry spacers at the centre-back hole |
+| XYZ (x2) | T8 nut hole on the XY stems' 10 mm hole (the leadscrew goes through both), centre-back hole over the stems' bolt hole 16.5 mm behind it; mid-planes level with the XY ears (tube -46.5 / +74); front toward the 0,0 corner |
 | Gantry Spacer (x2) | at the XYZ centre-back hole, between each XYZ flange and the middle |
 | XY (x2) | bolt B through each stem, which puts each gantry tube 35.4 mm from the bolt; the X-gantry XY upside down |
 | Z Motor, Z Lower | on the Z rails, leadscrew 24.18 mm in front of the rail line; Z Motor flush with the rail tops |
@@ -45,12 +45,12 @@ spin of the gantry spacers about bolt B.
 ## Findings (865 mm rails, 90 mm legs, 271 mm Z rails, lower rails 117 mm up)
 
 - **Heights:** leg bottom 9.9, lock top 106.9, Y rails 129.7 (underside 117), X rails 157.2,
-  X gantry 167.6, Y gantry 195.1, top of the middle 238.3 mm above the table.
-- **Travel:** the gantries move 580 mm each way before the rollers meet the corners or the middle
+  X gantry 167.6, Y gantry 195.1, top of the middle 252.1 mm above the table.
+- **Travel:** the gantries move 592 mm each way before the rollers meet the corners or the middle
   meets the rollers (bounding boxes, so a little conservative), against V1's 601 mm usable.
-  The tool sits 78 mm left of and in front of the gantry crossing.
+  The tool sits 66 mm left of and in front of the gantry crossing.
 - **Z:** the Z axis bottoms out with Z Lower on the T8 nut while the Z rail bottoms (and the tool
-  mount's bottom edge) are still 10.8 mm above the table. The 90 mm legs are 22 mm longer than V1's
+  mount's bottom edge) are still 24.6 mm above the table. The 90 mm legs are 22 mm longer than V1's
   68 mm for 271 mm Z rails; the 10 mm Z Motor-Z Lower gap is assumed, and a smaller gap lowers this.
 
 ## Cut list

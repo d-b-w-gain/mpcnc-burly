@@ -327,14 +327,19 @@ RM_FLIP = [(-S2, S2, 0), (S2, S2, 0), (0, 0, -1)]     # the same, upside down ab
 RM_180 = [(-S2, S2, 0), (-S2, -S2, 0), (0, 0, 1)]     # turned 180 about Z (Z plates)
 zl = C["z_rail"]
 gap = P["z_mount_gap"]
-z_xyz_top = z_gy + 43.18           # top face of the upper XYZ
+# XYZ heights: each plate's mid-plane level with the XY ears (tube -46.5 / +74 on both XYs).
+XYZ_MID_LO = z_gx - 46.5
+XYZ_MID_HI = z_gx + 74.0
+z_xyz_top = XYZ_MID_HI + 10.5       # top face of the upper XYZ (21 thick)
 NUT_H = 3.5
 # Lowest the Z axis can go: Z Lower resting on the T8 nut flange.
 zrb_min = z_xyz_top + NUT_H - (zl - 30 - gap)
 
 
-# The red XYs: bolt B through each stem; the X-gantry XY upside down (stem below its tube, reaching
-# -X), the Y-gantry XY stem above its tube, reaching -Y.
+# The red XYs: the X-gantry XY upside down (stem below its tube, reaching -X), the Y-gantry XY stem
+# above its tube, reaching -Y. Both stems share two holes: the 10 mm one (Yp 71.83, Zp 78.16) and a
+# bolt hole 16.5 behind it on the diagonal (Yp 83.5, Zp 89.83). The XYZs sit on them: leadscrew
+# (T8 nut hole) through the first, the XYZ centre-back hole (127.01) over the second.
 XY_X_GANTRY = [(0, 0, -1), (0, 1, 0), (1, 0, 0)]
 XY_Y_GANTRY = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
 XY_BOLT = (116.25, 71.83, 78.16)
@@ -345,18 +350,19 @@ def middle(xg, yg, zrb):
     bx, by = xg - B_TO_TUBE, yg - B_TO_TUBE
 
     def mw(mx, my, z):
-        dx, dy = mx - XYZ_B[0], my - XYZ_B[1]
+        """XYZ STL plan coordinates -> machine, with the T8 nut hole on the XY stems' 10 mm hole."""
+        dx, dy = mx - LEAD_M[0], my - LEAD_M[1]
         return (bx + S2 * dx + S2 * dy, by - S2 * dx + S2 * dy, z)
 
     def mf(cols, local, mxy, z):
         return frame(cols, local, mw(*mxy, z))
 
     core = [
-        ("xyz", mf(RM, (*XYZ_B, 0), XYZ_B, z_gx - 43.18), "XYZ", A),
-        ("gantry_spacer", mf(RM, (102.5, 97.59, 0), XYZ_B, z_gx - 36.68), "Gantry Spacer", A),
+        ("xyz", mf(RM, (*XYZ_B, 0), XYZ_B, XYZ_MID_LO - 10.5), "XYZ", A),
+        ("gantry_spacer", mf(RM, (102.5, 97.59, 0), XYZ_B, XYZ_MID_LO - 4.0), "Gantry Spacer", A),
         ("xy", frame(XY_X_GANTRY, XY_BOLT, (bx, by, z_gx)), "XY (X gantry)", B),
         ("xy", frame(XY_Y_GANTRY, XY_BOLT, (bx, by, z_gy)), "XY (Y gantry)", B),
-        ("gantry_spacer", mf(RM_FLIP, (102.5, 97.59, 0), XYZ_B, z_gy + 36.68), "Gantry Spacer", A),
+        ("gantry_spacer", mf(RM_FLIP, (102.5, 97.59, 0), XYZ_B, XYZ_MID_HI + 4.0), "Gantry Spacer", A),
         ("xyz", mf(RM_FLIP, (*XYZ_B, 0), XYZ_B, z_xyz_top), "XYZ", A),
     ]
     rt = zrb + zl
