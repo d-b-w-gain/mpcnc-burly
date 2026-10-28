@@ -32,24 +32,27 @@ assembly photos (docs.v1e.com, Burly section):
 | Top Corner | upper (X) rail in its U; its flange sits 1.5 mm above the bottom's (V1's "2 mm gap") |
 | Roller | two bearings (M8 at Xp 113.88) ride the top of the rail; gantry tube in its saddle 37.9 mm above the rail |
 | RollerMount | its bore on the gantry tube, its two screws in the roller's holes; NEMA17 on its 6 mm plate |
-| XYZ (x2) | Z rail pockets on the rails, T8 nut on the leadscrew; tension bolt B through a 6.5 mm flange |
-| Gantry Spacer (x2) | on bolt B between each XYZ flange and the XY stems |
-| XY (x2) | bolt B through the stem, which puts the gantry tube 35.4 mm from the bolt; each reaches back along its tube, away from the Z rails; the Y-gantry one upside down, so the tubes are 27.5 apart |
+| Middle (sub-assembly) | built in the upper XYZ's own frame and moved so tension bolt B lands on the machine; the stack along B, bottom up, is lower XYZ (upside down), gantry spacer, X-gantry XY stem, Y-gantry XY stem, gantry spacer, upper XYZ |
+| XYZ (x2) | bolt B through the side hole (V1: "align it with the hole on the side of the XYZ piece"); flat faces toward the middle, resting on the 23 mm spacers; the lower plate is the upper one flipped, so their outlines and Z rail pockets coincide |
+| XY (x2) | bolt B through the stem, which puts the gantry tube 35.4 mm from the bolt; the X-gantry one upside down, so the tubes are 27.5 apart and both XYs' tension-bolt ears are level with the XYZ mid-planes (within 0.4 mm) |
 | Z Motor, Z Lower | on the Z rails, leadscrew 24.18 mm in front of the rail line; Z Motor flush with the rail tops |
 | Tool Mount | rail cups on the Z rails, bottom flush with the rail bottoms (its screws land 22.5 and 97.5 mm up) |
 | Nut Trap (x2) | inside the Z rails, nuts at 22.5 and 97.5 mm |
 
-Less certain: the gap between Z Motor and Z Lower (set by your coupler, `z_mount_gap` = 10 mm), and the
+Checked by mesh interference (point-in-solid on every other vertex): XY against XY, XY against both
+XYZs and XY against the Z rails are clear apart from about ten touching points where decimated faces
+meet. Less certain: the gap between Z Motor and Z Lower (set by your coupler, `z_mount_gap` = 10 mm), and the
 spin of the gantry spacers about bolt B.
 
 ## Findings (865 mm rails, 90 mm legs, 271 mm Z rails, lower rails 117 mm up)
 
 - **Heights:** leg bottom 9.9, lock top 106.9, Y rails 129.7 (underside 117), X rails 157.2,
-  X gantry 167.6, Y gantry 195.1, top of the middle 238.3 mm above the table.
-- **Travel:** the gantries move 572 mm each way before the rollers meet the corners or the middle
-  meets the rollers (bounding boxes, so a little conservative), against V1's 601 mm usable.
+  X gantry 167.6, Y gantry 195.1, top of the middle 252.5 mm above the table.
+- **Travel:** the gantries move 539 mm (X) by 595 mm (Y) before the rollers meet the corners or the
+  middle meets the rollers (bounding boxes, so a little conservative), against V1's 601 mm usable.
+  The tool sits 88 mm left of and 72 mm in front of the gantry crossing.
 - **Z:** the Z axis bottoms out with Z Lower on the T8 nut while the Z rail bottoms (and the tool
-  mount's bottom edge) are still 10.8 mm above the table. The 90 mm legs are 22 mm longer than V1's
+  mount's bottom edge) are still 25 mm above the table. The 90 mm legs are 22 mm longer than V1's
   68 mm for 271 mm Z rails; the 10 mm Z Motor-Z Lower gap is assumed, and a smaller gap lowers this.
 
 ## Cut list
