@@ -1,5 +1,6 @@
 """V1's Burly cut list (docs.v1e.com/mpcnc/burly/conduit): every X and Y tube - both rails and the
-gantry - is the same length, and the usable area is that length less 264 mm.
+gantry - is the same length, and the usable area is that length less 264 mm. Legs are
+usable height - 13 unless params.json gives the measured length.
 Run directly to print the cut list for params.json."""
 import json
 from pathlib import Path
@@ -16,7 +17,7 @@ def cut_list(P):
         "x_rail": P["rail_x"], "y_rail": P["rail_y"],
         "x_work": P["rail_x"] - 264, "y_work": P["rail_y"] - 264, "z_work": P["z_work"],
         "z_rail": P["z_work"] + 190,
-        "leg": P["z_work"] - 13,
+        "leg": P.get("leg", P["z_work"] - 13),
         "leadscrew": P["z_work"] + 76,
     }
     c["tube_total"] = 3 * c["x_rail"] + 3 * c["y_rail"] + 2 * c["z_rail"] + 4 * c["leg"]

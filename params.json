@@ -1,7 +1,9 @@
 {
   "rail_x": 865,
   "rail_y": 865,
-  "z_work": 81,
+  "leg": 90,
+  "lower_rail_bottom": 117,
+  "z_work": 103,
   "tube_od": 25.4,
   "tube_wall": 1.65,
   "pose": {"x": 0.5, "y": 0.5, "z": 0.0},

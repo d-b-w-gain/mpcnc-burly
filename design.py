@@ -227,7 +227,7 @@ def nema(centre, shaft_axis, label):
 # Top Corner: rail U along Zp at (138.5, 107.07), flange face Yp 94.07, M4 square about (138.5, 23.5).
 #   U centre - flange = 12.96 + 13.0, so the corner halves sit 1.54 apart when the spacer sets 27.5.
 # Spacer Corner: saddles along Zp at (Xp 11.7, Yp 0) and along Xp at (Yp 27.5, Zp 11.7).
-# Foot: leg bore (102.5, 102.5) open to the table.
+# Foot: leg bore (102.5, 102.5) open to the table; the leg is clamped at any height in it.
 # Roller: rail along Zp at (90.18, 110) - two bearings on M8 bolts along Yp at (Xp 113.88, Zp 9.1 /
 #   65.9) ride its top; gantry saddle along Yp at (Xp 128.45, Zp 37.5) r 13.05 -> tube centre Xp 128.1.
 # RollerMount: gantry bore along Zp at (67.5, 80.22); screws at Xp 40.58 / 94.45, Zp 35.3 into the
@@ -257,8 +257,13 @@ TOOL_FACE_M = (102.5, 86.33 - (91.49 - 72.5))
 lx = (C["x_rail"] - 47) / 2          # leg / rail lines; the corners are 47 long along each rail
 ly = (C["y_rail"] - 47) / 2
 leg = C["leg"]
-z_lt = leg + LOCK_FLOOR                              # lock floor top = bottom corner back
-z_lr = z_lt + (128 - 105.06) - U_SAG                 # Y rails (lower)
+# Measured on the machine: leg length and the height of the lower rails' underside. The legs are
+# set in the feet with a block, so the leg bottom sits leg_lift above the table.
+R_TUBE = P["tube_od"] / 2
+z_lr = P["lower_rail_bottom"] + R_TUBE               # Y rails (lower)
+z_lt = z_lr - (128 - 105.06) + U_SAG                 # lock floor top = bottom corner back
+leg_lift = z_lt - LOCK_FLOOR - leg
+assert 0 <= leg_lift <= 25, f"leg bottom {leg_lift:.1f} mm above the table - check leg / lower_rail_bottom"
 z_ur = z_lr + RAIL_STACK                             # X rails (upper)
 z_gx = z_lr + GANTRY_ABOVE_RAIL                      # X gantry tube, carried along the Y rails
 z_gy = z_ur + GANTRY_ABOVE_RAIL
@@ -282,7 +287,7 @@ for i, (sx, sy) in enumerate([(-1, -1), (1, -1), (1, 1), (-1, 1)]):
     Tl, Tb, Ts, Tt = (compose(place, T) for T in (T_lock, T_bot, T_spc, T_top))
     corners.append(bd.Compound(label=f"Corner {i + 1}", children=[
         part("foot", compose(at(sx * lx, sy * ly), T_foot), "Foot", A),
-        tube(leg, "Leg", (sx * lx, sy * ly, leg / 2)),
+        tube(leg, "Leg", (sx * lx, sy * ly, leg_lift + leg / 2)),
         part("lock_corner", Tl, label_m("Lock Corner", Tl), A),
         part("bottom_corner", Tb, label_m("Bottom Corner", Tb), B),
         part("spacer_corner", Ts, "Spacer Corner", A),
@@ -410,7 +415,7 @@ if P.get("debug_report"):
         "rel_middle_xy": ([round(v, 1) for v in rel_lo], [round(v, 1) for v in rel_hi]),
         "tool_from_gantry": (round(tool_dx, 1), round(tool_dy, 1)),
         "work_centre": (round(wcx, 1), round(wcy, 1)),
-        "z": {"lock_top": round(z_lt, 2), "lower_rail": round(z_lr, 2), "upper_rail": round(z_ur, 2),
+        "z": {"leg_lift": round(leg_lift, 2), "lock_top": round(z_lt, 2), "lower_rail": round(z_lr, 2), "upper_rail": round(z_ur, 2),
               "x_gantry": round(z_gx, 2), "y_gantry": round(z_gy, 2), "xyz_top": round(z_xyz_top, 2),
               "z_rail_bottom_min": round(zrb_min, 2)},
     }))

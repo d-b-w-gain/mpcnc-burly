@@ -1,6 +1,6 @@
 # MPCNC Burly (J / 25.4 mm) - Tertius model
 
-Tertius project: `mpcnc_burly`. Edit `params.json` (rail length, Z height, pose, colours), then recompile.
+Tertius project: `mpcnc_burly`. Edit `params.json` (rail length, leg, rail height, Z height, pose, colours), then recompile.
 Built as a base for designing add-on parts, so the printed parts are V1's real geometry, not stand-ins.
 
 ![The MPCNC Burly model](docs/burly-iso.png)
@@ -9,8 +9,11 @@ Built as a base for designing add-on parts, so the printed parts are V1's real g
   decimated by vertex clustering on a 0.35 mm grid and stored as `mesh_<part>.json`
   (int16 vertices at 0.02 mm, zlib + base64). V1's "M" (mirrored) parts are the same meshes reflected.
   The tool mount is the M4 version.
-- **Tubes** follow V1's Burly cut list (`burly_calc.py`): all six X/Y tubes (rails and gantries) are the
-  rail length, Z rails = usable height + 190, legs = usable height - 13.
+- **Measured on the machine:** 865 mm rails (corner to corner), 90 mm legs, and the lower rails'
+  underside 117 mm above the table. The model builds the frame up from that rail height, which leaves
+  the leg bottoms 9.9 mm above the table inside the feet (V1 sets the legs with a block).
+- **Other tubes** follow V1's Burly cut list (`burly_calc.py`): all six X/Y tubes (rails and gantries)
+  are the rail length; the usable height is taken as leg + 13 = 103 mm, so Z rails = 103 + 190 = 293 mm.
 - **Steppers, leadscrew, coupler and T8 nut** are simple stand-ins. Bolts, bearings and belts are not drawn.
   Neither is a spindle; the tool mount is the last part on the Z axis.
 
@@ -22,7 +25,7 @@ assembly photos (docs.v1e.com, Burly section):
 
 | Part | Located by |
 |---|---|
-| Foot, Leg | leg through the foot bore to the table |
+| Foot, Leg | leg clamped in the foot bore, at the height the measured rail height gives |
 | Lock Corner | cup on the leg top; the leg stops on its 7 mm floor |
 | Bottom Corner | back face glued to the lock floor, lock screw on the leg axis; lower (Y) rail in its U |
 | Spacer Corner | saddles on both rails: sets the rail stack to 27.5 mm |
@@ -36,29 +39,28 @@ assembly photos (docs.v1e.com, Burly section):
 | Tool Mount | rail cups on the Z rails, bottom flush with the rail bottoms (its screws land 22.5 and 97.5 mm up) |
 | Nut Trap (x2) | inside the Z rails, nuts at 22.5 and 97.5 mm |
 
-Less certain: the gap between Z Motor and Z Lower (set by your coupler, `z_mount_gap` = 10 mm), and the
+Less certain: the Z rail length (293 mm assumed from V1's formula, not measured), the gap between Z Motor and Z Lower (set by your coupler, `z_mount_gap` = 10 mm), and the
 spin of the gantry spacers about bolt B.
 
-## Findings (865 mm rails, 81 mm Z)
+## Findings (865 mm rails, 90 mm legs, lower rails 117 mm up)
 
-- **Heights:** lock top 75, Y rails 97.8, X rails 125.3, X gantry 135.7, Y gantry 163.2, top of the
-  middle 206.4 mm above the table.
+- **Heights:** leg bottom 9.9, lock top 106.9, Y rails 129.7 (underside 117), X rails 157.2,
+  X gantry 167.6, Y gantry 195.1, top of the middle 238.3 mm above the table.
 - **Travel:** the gantries move 572 mm each way before the rollers meet the corners or the middle
   meets the rollers (bounding boxes, so a little conservative), against V1's 601 mm usable.
-- **Z:** with the Z rail bottoms on the table, Z Lower is 21 mm above the T8 nut, so the table, not
+- **Z:** with the Z rail bottoms on the table, Z Lower is 11 mm above the T8 nut, so the table, not
   the machine, sets the lowest Z.
 
 ## Cut list
 
 ```
 MPCNC Burly J, rails 865 x 865 mm
-usable area   601 x 601 x 81 mm
+usable area   601 x 601 x 103 mm
   3 x x_rail     865.0 mm
   3 x y_rail     865.0 mm
-  2 x z_rail     271.0 mm
-  4 x leg         68.0 mm
-leadscrew     157 mm (T8)
-tube total    6004 mm
+  2 x z_rail     293.0 mm   (from V1's formula - measure yours)
+  4 x leg         90.0 mm   (measured)
+leadscrew     179 mm (T8)
 ```
 
 ## Licence and attribution
