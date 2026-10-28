@@ -34,13 +34,12 @@ assembly photos (docs.v1e.com, Burly section):
 | RollerMount | its bore on the gantry tube, its two screws in the roller's holes; NEMA17 on its 6 mm plate |
 | XYZ (x2) | Z rail pockets on the rails, T8 nut on the leadscrew; front toward the 0,0 corner; resting on the 23 mm gantry spacers at the centre-back hole |
 | Gantry Spacer (x2) | at the XYZ centre-back hole, between each XYZ flange and the middle |
-| XY (x2) | each flipped on its gantry tube, its stem bolt through one of the XYZ side holes (V1: "align it with the hole on the side of the XYZ piece") - the X-gantry XY on one, the Y-gantry XY on the other, flanking the Z axis |
+| XY (x2) | bolt B through each stem, which puts each gantry tube 35.4 mm from the bolt; the X-gantry XY upside down |
 | Z Motor, Z Lower | on the Z rails, leadscrew 24.18 mm in front of the rail line; Z Motor flush with the rail tops |
 | Tool Mount | rail cups on the Z rails, bottom flush with the rail bottoms (its screws land 22.5 and 97.5 mm up) |
 | Nut Trap (x2) | inside the Z rails, nuts at 22.5 and 97.5 mm |
 
-Checked by mesh interference (point-in-solid on sampled vertices): the XYs are clear of each other,
-of both XYZs and of the Z rails. Less certain: the gap between Z Motor and Z Lower (set by your coupler, `z_mount_gap` = 10 mm), and the
+ Less certain: the gap between Z Motor and Z Lower (set by your coupler, `z_mount_gap` = 10 mm), and the
 spin of the gantry spacers about bolt B.
 
 ## Findings (865 mm rails, 90 mm legs, 271 mm Z rails, lower rails 117 mm up)

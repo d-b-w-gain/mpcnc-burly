@@ -333,31 +333,16 @@ NUT_H = 3.5
 zrb_min = z_xyz_top + NUT_H - (zl - 30 - gap)
 
 
-# The red XYs: each flipped on its tube, its stem bolt through one of the XYZ side holes
-# (49.51 / 155.49, 103.53) - "align it with the hole on the side of the XYZ piece" - the X-gantry
-# XY on one, the Y-gantry XY on the other. Mesh check: no overlap with each other, the XYZs or the
-# Z rails.
-XY_X_GANTRY = [(0, 0, -1), (0, 1, 0), (1, 0, 0)]     # stem below the tube
-XY_Y_GANTRY = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]      # stem above the tube
+# The red XYs: bolt B through each stem; the X-gantry XY upside down (stem below its tube, reaching
+# -X), the Y-gantry XY stem above its tube, reaching -Y.
+XY_X_GANTRY = [(0, 0, -1), (0, 1, 0), (1, 0, 0)]
+XY_Y_GANTRY = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
 XY_BOLT = (116.25, 71.83, 78.16)
-XY_TUBE = (116.25, 107.2, 0)
-
-
-def _side_hole(mx, my):
-    """XYZ side hole in plan, relative to the XYZ's centre-back hole (127.01) - the middle's origin."""
-    T = frame(RM_FLIP, (*XYZ_B, 0), (0, 0, 0))
-    return apply(T, (mx, my, 0))[:2]
-
-
-SIDE_X = _side_hole(155.49, 103.53)                  # carries the X-gantry XY
-SIDE_Y = _side_hole(49.51, 103.53)                   # carries the Y-gantry XY
-# Gantry tubes relative to the middle's origin, from the XYs on those holes.
-TUBE_Y_OFF = apply(frame(XY_X_GANTRY, XY_BOLT, (*SIDE_X, 0)), XY_TUBE)[1]
-TUBE_X_OFF = apply(frame(XY_Y_GANTRY, XY_BOLT, (*SIDE_Y, 0)), XY_TUBE)[0]
+B_TO_TUBE = 107.2 - 71.83
 
 
 def middle(xg, yg, zrb):
-    bx, by = xg - TUBE_X_OFF, yg - TUBE_Y_OFF
+    bx, by = xg - B_TO_TUBE, yg - B_TO_TUBE
 
     def mw(mx, my, z):
         dx, dy = mx - XYZ_B[0], my - XYZ_B[1]
@@ -369,8 +354,8 @@ def middle(xg, yg, zrb):
     core = [
         ("xyz", mf(RM, (*XYZ_B, 0), XYZ_B, z_gx - 43.18), "XYZ", A),
         ("gantry_spacer", mf(RM, (102.5, 97.59, 0), XYZ_B, z_gx - 36.68), "Gantry Spacer", A),
-        ("xy", frame(XY_X_GANTRY, XY_BOLT, (bx + SIDE_X[0], by + SIDE_X[1], z_gx)), "XY (X gantry)", B),
-        ("xy", frame(XY_Y_GANTRY, XY_BOLT, (bx + SIDE_Y[0], by + SIDE_Y[1], z_gy)), "XY (Y gantry)", B),
+        ("xy", frame(XY_X_GANTRY, XY_BOLT, (bx, by, z_gx)), "XY (X gantry)", B),
+        ("xy", frame(XY_Y_GANTRY, XY_BOLT, (bx, by, z_gy)), "XY (Y gantry)", B),
         ("gantry_spacer", mf(RM_FLIP, (102.5, 97.59, 0), XYZ_B, z_gy + 36.68), "Gantry Spacer", A),
         ("xyz", mf(RM_FLIP, (*XYZ_B, 0), XYZ_B, z_xyz_top), "XYZ", A),
     ]
