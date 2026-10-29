@@ -19,9 +19,9 @@ Built as a base for designing add-on parts, so the printed parts are V1's real g
   the rail. Fitted by mesh search: the bracket sits in the anchor's pocket with only a few touching
   points. The belt clips that slide into the anchors are not drawn.
 - **Drag chain mounts** (add-on, see credits) on both X-rail rollers and the left Y-rail roller: on
-  the roller's two fixed bearing bolts (1.5 in bolts instead of 1.25 in), bar flat on the outboard
-  bolt face, chain plate below. Clear of the roller, RollerMount and gantry tube end. The 10 x 15
-  chain itself is not drawn.
+  the roller's two lower bearing bolts (30 deg from vertical, through the inboard arm), outside the
+  bearings, so the chain face points down at the table under the rail. Clear of the roller and rail.
+  The 10 x 15 chain itself is not drawn.
 - **Steppers, leadscrew, coupler and T8 nut** are simple stand-ins. Bolts, bearings and belts are not drawn.
   Neither is a spindle; the tool mount is the last part on the Z axis.
 

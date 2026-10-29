@@ -312,11 +312,11 @@ T_mount = frame([(0, 0, 1), (1, 0, 0), (0, 1, 0)], (67.5, 80.22, 35.3), (128.1, 
 MOTOR_C = (67.5, 124.69, 6 + NEMA[1] / 2)
 ROLLER_HALF = 37.7      # roller Yp 147.7 - rail 110: how far the roller reaches inboard of its rail
 
-# Drag chain mount (willnewton, thing:1272581): its two holes (57 mm apart) on the roller's fixed
-# bearing bolts (56.8 apart, along Yp at Xp 113.88), bar flat on the outboard bolt face (1.5 in
-# bolts instead of 1.25 in) with the chain plate hanging below. Placed by sliding it along the bolts
-# to the first position clear of the roller, RollerMount and gantry tube end. Roller coordinates.
-T_DRAG = ([[0.0, 0.866, -0.5], [0.0, 0.5, 0.866], [1.0, 0.0, 0.0]], [3.782, -0.085, -62.57])
+# Drag chain mount (willnewton, thing:1272581): its two holes (57 mm apart) on the roller's two lower
+# bearing bolts (56.8 apart, 30 deg from vertical through the inboard arm, Xp/Yp ~ 87.9 / 135.7) -
+# bolt head, mount, bearing, arm - so the chain face points straight down under the rail. Slid
+# along the bolts to sit against the bearings; clear of the roller and rail. Roller coordinates.
+T_DRAG = ([[0, 0, 1], [0, 1, 0], [-1, 0, 0]], [59.039, -8.09, 137.57])
 DRAG_CHAIN_ON = ("Roller X front", "Roller X back", "Roller Y left")
 
 
