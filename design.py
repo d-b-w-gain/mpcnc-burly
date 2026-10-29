@@ -338,6 +338,51 @@ def rollers(xg, yg):
     return out
 
 
+# Z drag chain track (user's own): a 25 x 25 x 2.5 angle across the machine on two clamp brackets
+# (nosilec_verige.stl) around the NEMA17s of the two Y-rail rollers. Bracket: ring 42.4 square
+# inside (the motor), 10 thick, centre (-21.2, 21.2); tab 25 wide on top, its end face at Yb 69.4,
+# 48.2 above the motor axis. The angle lies across the tab ends, vertical leg at the back.
+ANGLE = (25.0, 25.0, 2.5)
+BRACKET_C = (-21.2, 21.2, 0.0)
+TAB_TOP = 69.4 - 21.2
+TRACK_COLOR = bd.Color(0.92, 0.92, 0.90)
+
+
+def chain_track(yg, side=None):
+    """Brackets on both Y-roller motors and the angle across them. side "up": tabs up, angle on top
+    as a tray (vertical leg at the back). side "back": tabs pointing back (+Y), the angle's vertical
+    leg on the tab ends and its floor running back under the chain."""
+    side = side or P.get("chain_track_side", "back")
+    Tm = compose(compose(at(0, yg), T_roll_y), T_mount)
+    cx, cy, cz = apply(Tm, MOTOR_C)                     # left motor centre; shaft along X
+    x0 = cx + NEMA[1] / 2 - 11                           # bracket's outboard face, 1 mm off the motor end
+    tab = (0, 0, 1) if side == "up" else (0, 1, 0)
+    # X_b = Y_b x Z_b for a proper rotation; Z_b along the motor shaft (+X left, -X right)
+    def cols(zb):
+        yb = tab
+        xb = (yb[1] * zb[2] - yb[2] * zb[1], yb[2] * zb[0] - yb[0] * zb[2], yb[0] * zb[1] - yb[1] * zb[0])
+        return [xb, yb, zb]
+    left = frame(cols((1, 0, 0)), BRACKET_C, (x0, cy, cz))
+    right = frame(cols((-1, 0, 0)), BRACKET_C, (-x0, cy, cz))
+    length = -2 * x0
+    w, h, t = ANGLE
+    if side == "up":
+        zf = cz + TAB_TOP
+        floor = bd.Box(length, w, t).moved(bd.Location((0, cy, zf + t / 2)))
+        wall = bd.Box(length, t, h - t).moved(bd.Location((0, cy + w / 2 - t / 2, zf + t + (h - t) / 2)))
+        zr = (zf, zf + h)
+    else:
+        yw = cy + TAB_TOP                                # tab end face
+        wall = bd.Box(length, t, w).moved(bd.Location((0, yw + t / 2, cz)))
+        floor = bd.Box(length, h - t, t).moved(bd.Location((0, yw + t + (h - t) / 2, cz - w / 2 + t / 2)))
+        zr = (cz - w / 2, cz + w / 2)
+    angle = bd.Compound(label=f"Z chain track (angle 25x25x2.5, {length:.0f} long)", children=[floor, wall])
+    for c in angle.children:
+        c.color = TRACK_COLOR
+    angle.color = TRACK_COLOR
+    return [part("chain_bracket", left, "Chain track bracket", A),
+            part("chain_bracket", right, "Chain track bracket", A), angle], length, zr
+
 # ---- middle and Z axis, placed from bolt B (the middle's vertical tension bolt) ----
 RM = [(S2, -S2, 0), (S2, S2, 0), (0, 0, 1)]          # middle frame: front (-Ym) faces the 0,0 corner
 RM_FLIP = [(-S2, S2, 0), (S2, S2, 0), (0, 0, -1)]     # the same, upside down about Ym
@@ -423,6 +468,10 @@ xg_lo = max(xg_lo, -(lx - ROLLER_HALF) - rel_lo[0])
 xg_hi = min(xg_hi, (lx - ROLLER_HALF) - rel_hi[0])
 yg_lo = max(yg_lo, -(ly - ROLLER_HALF) - rel_lo[1])
 yg_hi = min(yg_hi, (ly - ROLLER_HALF) - rel_hi[1])
+if P.get("chain_track_side", "back") == "back":
+    # the track sits TAB_TOP + 25 behind the X gantry and spans the machine: it stops at the
+    # back X-rail roller
+    yg_hi = min(yg_hi, (ly - ROLLER_HALF) - (TAB_TOP + ANGLE[1]))
 tool_dx, tool_dy = tool0[0], tool0[1]            # tool-mount face centre relative to (xg, yg)
 wcx = (xg_lo + xg_hi) / 2 + tool_dx
 wcy = (yg_lo + yg_hi) / 2 + tool_dy
@@ -434,7 +483,8 @@ zrb_low = max(0.0, zrb_min)
 zrb = zrb_low + P["pose"]["z"] * C["z_work"]
 core, zaxis, zprims, tool = middle(xg, yg, zrb)
 
-gantry = [tube(C["x_rail"], "X gantry tube", (0, yg, z_gx), "X"),
+track, track_len, track_z = chain_track(yg)
+gantry = [*track, tube(C["x_rail"], "X gantry tube", (0, yg, z_gx), "X"),
           tube(C["y_rail"], "Y gantry tube", (xg, 0, z_gy), "Y")]
 table = box((max(C["x_rail"], 1000), max(C["y_rail"], 1000), 18), (0, 0, -9), "Table top", TABLE)
 work = box((C["x_work"], C["y_work"], 0.5), (wcx, wcy, 0.25), "Usable area (V1 cut list)", WORK)
@@ -445,6 +495,7 @@ if P.get("debug_report"):
         "rel_middle_xy": ([round(v, 1) for v in rel_lo], [round(v, 1) for v in rel_hi]),
         "tool_from_gantry": (round(tool_dx, 1), round(tool_dy, 1)),
         "work_centre": (round(wcx, 1), round(wcy, 1)),
+        "track": {"length": round(track_len, 1), "z": [round(v, 1) for v in track_z]},
         "z": {"leg_lift": round(leg_lift, 2), "lock_top": round(z_lt, 2), "lower_rail": round(z_lr, 2), "upper_rail": round(z_ur, 2),
               "x_gantry": round(z_gx, 2), "y_gantry": round(z_gy, 2), "xyz_top": round(z_xyz_top, 2),
               "z_rail_bottom_min": round(zrb_min, 2), "z_rail_bottom_low": round(zrb_low, 2)},

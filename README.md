@@ -22,6 +22,12 @@ Built as a base for designing add-on parts, so the printed parts are V1's real g
   the roller's two lower bearing bolts (30 deg from vertical, through the inboard arm), outside the
   bearings, so the chain face points down at the table under the rail. Clear of the roller and rail.
   The 10 x 15 chain itself is not drawn.
+- **Z drag chain track**: a 25 x 25 x 2.5 angle, **cut to 802 mm**, on two clamp brackets
+  (`nosilec_verige.stl`) around the NEMA17s of the two Y-rail rollers. Tabs point back
+  (`chain_track_side` in `params.json`; "up" puts the track in the Z Lower plate's path), the angle's
+  vertical leg on the tab ends and its floor running back. It sits 48-73 mm behind the X gantry,
+  199.6-224.6 mm above the table, and limits Y travel at the back by about 39 mm (553 mm instead of
+  592). The middle and Z axis clear it by at least 14 mm at every position.
 - **Steppers, leadscrew, coupler and T8 nut** are simple stand-ins. Bolts, bearings and belts are not drawn.
   Neither is a spindle; the tool mount is the last part on the Z axis.
 

@@ -9,6 +9,7 @@
   "tube_wall": 1.65,
   "pose": {"x": 0.5, "y": 0.5, "z": 0.0},
   "z_mount_gap": 10,
+  "chain_track_side": "back",
   "colors": {"A": [0.16, 0.16, 0.18], "B": [0.80, 0.10, 0.10]},
   "debug_report": false
 }
