@@ -425,7 +425,10 @@ def chain_track(yg, side=None):
         xb = (yb[1] * zb[2] - yb[2] * zb[1], yb[2] * zb[0] - yb[0] * zb[2], yb[0] * zb[1] - yb[1] * zb[0])
         return [xb, yb, zb]
     left = frame(cols((1, 0, 0)), BRACKET_C, (x0, cy, cz))
-    right = frame(cols((-1, 0, 0)), BRACKET_C, (-x0, cy, cz))
+    # the same part on the right motor, put on the other way round: same orientation as the left
+    # one (tab and holes still at the back), ring mirrored across the machine centre
+    right = frame(cols((1, 0, 0)), BRACKET_C, (-x0 - 10.0, cy, cz)) if side == "up" else \
+        frame(cols((-1, 0, 0)), BRACKET_C, (-x0, cy, cz))
     length = -2 * x0
     w, h, t = ANGLE
     if side == "up":
@@ -447,8 +450,7 @@ def chain_track(yg, side=None):
     angle.color = TRACK_COLOR
     if side == "up":
         o = P.get("chain_track_front", 1.0) + ANGLE[0] / 2          # tab centre under the angle
-        brackets = [place(chain_bracket(o), left, "Chain track bracket (left)", A),
-                    place(chain_bracket(-o), right, "Chain track bracket (right)", A)]
+        brackets = [place(chain_bracket(o), T, "Chain track bracket", A) for T in (left, right)]
     else:
         brackets = [part("chain_bracket", left, "Chain track bracket", A),
                     part("chain_bracket", right, "Chain track bracket", A)]
@@ -581,9 +583,9 @@ model = bd.Compound(label="MPCNC Burly J", children=[
     bd.Compound(label="Z axis", children=[*(part(n, T, l, c) for n, T, l, c in zaxis), *zprims]),
 ])
 
-# Print files for the redrawn brackets: compile with "export_part": "chain_bracket_left" / "_right".
+# Print file for the redrawn bracket (one part for both motors): compile with "export_part": "chain_bracket".
 _o = P.get("chain_track_front", 1.0) + ANGLE[0] / 2
-_exports = {"chain_bracket_left": lambda: chain_bracket(_o), "chain_bracket_right": lambda: chain_bracket(-_o)}
+_exports = {"chain_bracket": lambda: chain_bracket(_o)}
 if P.get("export_part") in _exports:
     model = _exports[P["export_part"]]()
     model.label = P["export_part"]
