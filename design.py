@@ -350,7 +350,7 @@ TRACK_COLOR = bd.Color(0.92, 0.92, 0.90)
 
 def chain_track(yg, side=None):
     """Brackets on both Y-roller motors and the angle across them. side "up": tabs up, angle on top
-    as a tray (vertical leg at the back). side "back": tabs pointing back (+Y), the angle's vertical
+    as a tray (upright leg at the front). side "back": tabs pointing back (+Y), the angle's vertical
     leg on the tab ends and its floor running back under the chain."""
     side = side or P.get("chain_track_side", "back")
     Tm = compose(compose(at(0, yg), T_roll_y), T_mount)
@@ -367,9 +367,12 @@ def chain_track(yg, side=None):
     length = -2 * x0
     w, h, t = ANGLE
     if side == "up":
+        # Upright leg at the front, as a guard between the chain and the Z axis; its front face
+        # chain_track_front mm behind the motor axis (the Z plates reach 2.2 mm in front of it).
         zf = cz + TAB_TOP
-        floor = bd.Box(length, w, t).moved(bd.Location((0, cy, zf + t / 2)))
-        wall = bd.Box(length, t, h - t).moved(bd.Location((0, cy + w / 2 - t / 2, zf + t + (h - t) / 2)))
+        yf = cy + P.get("chain_track_front", 1.0)
+        floor = bd.Box(length, w, t).moved(bd.Location((0, yf + w / 2, zf + t / 2)))
+        wall = bd.Box(length, t, h - t).moved(bd.Location((0, yf + t / 2, zf + t + (h - t) / 2)))
         zr = (zf, zf + h)
     else:
         yw = cy + TAB_TOP                                # tab end face
