@@ -23,11 +23,11 @@ Built as a base for designing add-on parts, so the printed parts are V1's real g
   bearings, so the chain face points down at the table under the rail. Clear of the roller and rail.
   The 10 x 15 chain itself is not drawn.
 - **Z drag chain track**: a 25 x 25 x 2.5 angle, **cut to 802 mm**, on two clamp brackets
-  (`nosilec_verige.stl`) around the NEMA17s of the two Y-rail rollers. Tabs point back
-  (`chain_track_side` in `params.json`; "up" puts the track in the Z Lower plate's path), the angle's
-  vertical leg on the tab ends and its floor running back. It sits 48-73 mm behind the X gantry,
-  199.6-224.6 mm above the table, and limits Y travel at the back by about 39 mm (553 mm instead of
-  592). The middle and Z axis clear it by at least 14 mm at every position.
+  (`nosilec_verige.stl`) around the NEMA17s of the two Y-rail rollers, tabs up, the angle lying on
+  the tab tops above the motors as a tray (vertical leg at the back), 260.3-285.3 mm above the table.
+  Known clash: the Z Lower plate overlaps the front 10 mm of the tray floor over the lowest 7 mm of
+  Z travel (Z rail bottoms below 31.8 mm). `chain_track_side: "back"` turns the tabs back instead,
+  which clears the Z axis but costs about 39 mm of Y travel.
 - **Steppers, leadscrew, coupler and T8 nut** are simple stand-ins. Bolts, bearings and belts are not drawn.
   Neither is a spindle; the tool mount is the last part on the Z axis.
 
