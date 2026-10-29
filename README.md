@@ -18,6 +18,10 @@ Built as a base for designing add-on parts, so the printed parts are V1's real g
   each Bottom Corner, hooked over the corner's zip-tie bracket with the box running inboard along
   the rail. Fitted by mesh search: the bracket sits in the anchor's pocket with only a few touching
   points. The belt clips that slide into the anchors are not drawn.
+- **Drag chain mounts** (add-on, see credits) on both X-rail rollers and the left Y-rail roller: on
+  the roller's two fixed bearing bolts (1.5 in bolts instead of 1.25 in), bar flat on the outboard
+  bolt face, chain plate below. Clear of the roller, RollerMount and gantry tube end. The 10 x 15
+  chain itself is not drawn.
 - **Steppers, leadscrew, coupler and T8 nut** are simple stand-ins. Bolts, bearings and belts are not drawn.
   Neither is a spindle; the tool mount is the last part on the Z axis.
 
@@ -84,6 +88,11 @@ in `burly_calc.py` comes from V1's documentation.
 The belt anchors (`mesh_belt_anchor*.json`) are derived from **MPCNC Belt Mount/Tensioner** by
 DodgeDerek ([thing:1833934](https://www.thingiverse.com/thing:1833934)), licensed under
 [CC BY-NC](https://creativecommons.org/licenses/by-nc/4.0/); decimated and placed the same way.
+
+The drag chain mounts (`mesh_drag_chain_mount.json`) are derived from **MPCNC drag chain / cable
+carrier for XY-axis** by willnewton ([thing:1272581](https://www.thingiverse.com/thing:1272581)),
+licensed under [CC BY-NC](https://creativecommons.org/licenses/by-nc/4.0/); decimated and placed the
+same way.
 
 As required by the ShareAlike term, this whole repository is released under the same licence,
 **CC BY-NC-SA 4.0** (see `LICENSE`). This is a personal model of one machine; it is not made or
