@@ -373,9 +373,10 @@ def place(shape, T, label, color):
 def chain_bracket(tab_offset, inner=None):
     """Motor clamp bracket for the chain track, redrawn from nosilec_verige.stl (same frame: ring
     centre (-21.2, 21.2), thickness along Zb 0-10). Ring sized to the motor plus clearance, 5 wall;
-    clamp ear with M3 screw and nut pocket; 11 mm window through the top wall over the motor's
-    connector (kept centred, widened from 11 to 15 for a 6-pin housing); tab 25 x 10 with two M3 holes 10 apart, 7.4 deep, moved tab_offset mm
-    along Xb so it sits under the angle."""
+    clamp ear with M3 screw and nut pocket; no connector window (the ring sits clear of the
+    connector); an 18 x 2.5 relief across the outside of the bottom wall for the RollerMount's rib
+    under the motor; tab 25 x 10 with two M3 holes 10 apart, 7.4 deep, moved tab_offset mm along
+    Xb so it sits under the angle."""
     inner = inner or STEPPER["square"] + STEPPER["fit_clearance"]
     cx, cy = BRACKET_C[0], BRACKET_C[1]
     h, H = inner / 2, inner / 2 + 5.0
@@ -397,7 +398,7 @@ def chain_bracket(tab_offset, inner=None):
     body += block(cx + o - 12.5, cy + h, cx + o + 12.5, tab_end)                   # tab
     body -= opening
     body -= block(cx - H - 10.0, cy - 1.0, cx - h, cy + 1.0)                       # clamp slit
-    body -= block(cx - 7.5, cy + h, cx + 7.5, cy + h + 11.0)                       # connector window
+    body -= block(cx - 9.0, cy - H, cx + 9.0, cy - H + 2.5)                        # relief for the mount's rib
     down = (90, 0, 0)                                                              # cylinder axis -> -Yb
     ex = cx - H - 5.0
     body -= bd.Cylinder(1.6, 11.0).moved(bd.Location((ex, cy + 0.5, 5.0), down))   # clamp screw
@@ -414,7 +415,9 @@ def chain_track(yg, side=None):
     side = side or P.get("chain_track_side", "back")
     Tm = compose(compose(at(0, yg), T_roll_y), T_mount)
     cx, cy, cz = apply(Tm, MOTOR_C)                     # left motor centre; shaft along X
-    x0 = cx + NEMA[1] / 2 - 10                           # ring on the rear end cap, flush with the motor end
+    # ring on the motor body just in front of the connector (5-11 mm from the rear end): its rear
+    # face chain_bracket_from_rear mm from the motor's rear end
+    x0 = cx + NEMA[1] / 2 - P.get("chain_bracket_from_rear", 12.0) - 10
     tab = (0, 0, 1) if side == "up" else (0, 1, 0)
     # X_b = Y_b x Z_b for a proper rotation; Z_b along the motor shaft (+X left, -X right)
     def cols(zb):
