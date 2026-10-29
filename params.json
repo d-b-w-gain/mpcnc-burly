@@ -7,10 +7,30 @@
   "z_work": 81,
   "tube_od": 25.4,
   "tube_wall": 1.65,
-  "pose": {"x": 0.5, "y": 0.5, "z": 0.0},
+  "pose": {
+    "x": 0.5,
+    "y": 0.5,
+    "z": 0.0
+  },
   "z_mount_gap": 10,
+  "motor": {
+    "square": 42.5,
+    "length": 48.0,
+    "fit_clearance": 0.4
+  },
   "chain_track_side": "up",
   "chain_track_front": 1.0,
-  "colors": {"A": [0.16, 0.16, 0.18], "B": [0.80, 0.10, 0.10]},
+  "colors": {
+    "A": [
+      0.16,
+      0.16,
+      0.18
+    ],
+    "B": [
+      0.8,
+      0.1,
+      0.1
+    ]
+  },
   "debug_report": false
 }

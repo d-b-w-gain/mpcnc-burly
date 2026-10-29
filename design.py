@@ -201,7 +201,10 @@ def rod(d, length, base, label, color):
 
 
 A, B = COL["A"], COL["B"]
-NEMA = 42.3, 40.0
+# Steppers: TEVO 17HD40005 (user's photo), 42.5 square measured; body length estimated from the
+# photo (~48, rear end cap ~10 with the 6-pin connector on top of it).
+STEPPER = P.get("motor", {"square": 42.5, "length": 48.0, "fit_clearance": 0.4})
+NEMA = STEPPER["square"], STEPPER["length"]
 I3 = [(1, 0, 0), (0, 1, 0), (0, 0, 1)]
 MIRROR_X = ([[-1, 0, 0], [0, 1, 0], [0, 0, 1]], [0, 0, 0])
 MIRROR_Y = ([[1, 0, 0], [0, -1, 0], [0, 0, 1]], [0, 0, 0])
@@ -320,6 +323,14 @@ T_DRAG = ([[0, 0, 1], [0, 1, 0], [-1, 0, 0]], [59.039, -8.09, 137.57])
 DRAG_CHAIN_ON = ("Roller X front", "Roller X back", "Roller Y left")
 
 
+def connector(Tm, axis):
+    """6-pin motor connector on top of the stepper's rear end cap (14 across, 6 along, 5 tall),
+    5-11 mm from the rear end, as on the user's TEVO motors. Mount coordinates -> world via Tm."""
+    c = apply(Tm, (67.5, MOTOR_C[1] + NEMA[0] / 2 + 2.5, 6 + NEMA[1] - 8.0))
+    size = (6.0, 14.0, 5.0) if axis == "X" else (14.0, 6.0, 5.0)
+    return box(size, c, "Motor connector", bd.Color(0.95, 0.95, 0.92))
+
+
 def rollers(xg, yg):
     out = []
     for label, T, axis in [
@@ -333,6 +344,7 @@ def rollers(xg, yg):
             part("roller", T, label_m("Roller", T), A),
             part("roller_mount", Tm, "RollerMount", B),
             nema(apply(Tm, MOTOR_C), axis, "Stepper NEMA17"),
+            connector(Tm, axis),
             *([part("drag_chain_mount", compose(T, T_DRAG), "Drag Chain Mount", A)] if label in DRAG_CHAIN_ON else []),
         ]))
     return out
@@ -344,7 +356,7 @@ def rollers(xg, yg):
 # 48.2 above the motor axis. The angle lies across the tab ends, vertical leg at the back.
 ANGLE = (25.0, 25.0, 2.5)
 BRACKET_C = (-21.2, 21.2, 0.0)
-TAB_TOP = 69.4 - 21.2
+TAB_TOP = (STEPPER["square"] + STEPPER["fit_clearance"]) / 2 + 5.0 + 22.0    # tab end above the motor axis
 TRACK_COLOR = bd.Color(0.92, 0.92, 0.90)
 
 
@@ -358,34 +370,42 @@ def place(shape, T, label, color):
     return s
 
 
-def chain_bracket(tab_offset):
-    """Motor clamp bracket for the chain track, redrawn from nosilec_verige.stl (same frame and
-    sizes) with the tab - and its two M3 holes - moved tab_offset mm along Xb so they sit under
-    the angle. Ring 42.4 square inside (NEMA17), 5 wall, 10 thick; clamp ear with M3 screw and nut
-    pocket; tab 25 x 10, end face at Yb 69.4, M3 holes 10 apart, 7.3 deep."""
-    def octagon(x0, y0, x1, y1, c):
-        return bd.Polygon((x0 + c, y0), (x1 - c, y0), (x1, y0 + c), (x1, y1 - c),
-                          (x1 - c, y1), (x0 + c, y1), (x0, y1 - c), (x0, y0 + c), align=None)
-    o = tab_offset
-    ring = bd.extrude(octagon(-47.4, -5.0, 5.0, 47.4, 7.1), 10) - bd.extrude(octagon(-42.4, 0.0, 0.0, 42.4, 4.2), 10)
-    ear = bd.Box(12.0, 11.0, 10.0, align=(bd.Align.MIN, bd.Align.MIN, bd.Align.MIN)).moved(bd.Location((-57.4, 16.2, 0)))
-    tab = bd.Box(25.0, 69.4 - 42.4, 10.0, align=(bd.Align.MIN, bd.Align.MIN, bd.Align.MIN)).moved(
-        bd.Location((-33.7 + o, 42.4, 0)))
-    body = ring + ear + tab
-    # keep the tab out of the motor opening
-    body -= bd.extrude(octagon(-42.4, 0.0, 0.0, 42.4, 4.2), 10)
-    slit = bd.Box(15.0, 2.0, 10.0, align=(bd.Align.MIN, bd.Align.MIN, bd.Align.MIN)).moved(bd.Location((-57.4, 20.2, 0)))
-    pocket = bd.Box(11.0, 11.0, 10.0, align=(bd.Align.MIN, bd.Align.MIN, bd.Align.MIN)).moved(
-        bd.Location((-26.7 + o, 42.4, 0)))
-    ydir = (90, 0, 0)          # cylinder axis along -Y after this rotation; place by its centre
-    screw = bd.Cylinder(1.6, 11.0).moved(bd.Location((-52.39, 21.7, 5.0), ydir))
-    nut = bd.extrude(bd.RegularPolygon(3.23, 6), 2.2).moved(bd.Location((-52.39, 16.2 + 2.2, 5.0), ydir))
-    holes = [bd.Cylinder(1.6, 7.4, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MIN)).moved(
-        bd.Location((x + o, 69.4, 5.0), ydir)) for x in (-16.2, -26.2)]
-    for cut in (slit, pocket, screw, nut, *holes):
-        body -= cut
-    return body
+def chain_bracket(tab_offset, inner=None):
+    """Motor clamp bracket for the chain track, redrawn from nosilec_verige.stl (same frame: ring
+    centre (-21.2, 21.2), thickness along Zb 0-10). Ring sized to the motor plus clearance, 5 wall;
+    clamp ear with M3 screw and nut pocket; 11 mm window through the top wall over the motor's
+    connector (kept centred, widened from 11 to 15 for a 6-pin housing); tab 25 x 10 with two M3 holes 10 apart, 7.4 deep, moved tab_offset mm
+    along Xb so it sits under the angle."""
+    inner = inner or STEPPER["square"] + STEPPER["fit_clearance"]
+    cx, cy = BRACKET_C[0], BRACKET_C[1]
+    h, H = inner / 2, inner / 2 + 5.0
 
+    def octagon(hx, c):
+        return bd.Polygon((cx - hx + c, cy - hx), (cx + hx - c, cy - hx), (cx + hx, cy - hx + c),
+                          (cx + hx, cy + hx - c), (cx + hx - c, cy + hx), (cx - hx + c, cy + hx),
+                          (cx - hx, cy + hx - c), (cx - hx, cy - hx + c), align=None)
+
+    def block(x0, y0, x1, y1):
+        return bd.Box(x1 - x0, y1 - y0, 10.0, align=(bd.Align.MIN, bd.Align.MIN, bd.Align.MIN)).moved(
+            bd.Location((x0, y0, 0)))
+
+    o = tab_offset
+    tab_end = cy + H + 22.0
+    opening = bd.extrude(octagon(h, 4.2), 10)
+    body = bd.extrude(octagon(H, 7.1), 10) - opening
+    body += block(cx - H - 10.0, cy - 5.0, cx - H + 2.0, cy + 6.0)               # clamp ear
+    body += block(cx + o - 12.5, cy + h, cx + o + 12.5, tab_end)                   # tab
+    body -= opening
+    body -= block(cx - H - 10.0, cy - 1.0, cx - h, cy + 1.0)                       # clamp slit
+    body -= block(cx - 7.5, cy + h, cx + 7.5, cy + h + 11.0)                       # connector window
+    down = (90, 0, 0)                                                              # cylinder axis -> -Yb
+    ex = cx - H - 5.0
+    body -= bd.Cylinder(1.6, 11.0).moved(bd.Location((ex, cy + 0.5, 5.0), down))   # clamp screw
+    body -= bd.extrude(bd.RegularPolygon(3.23, 6), 2.2).moved(bd.Location((ex, cy - 5.0 + 2.2, 5.0), down))
+    for dx in (-5.0, 5.0):                                                         # M3 holes for the angle
+        body -= bd.Cylinder(1.6, 7.4, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MIN)).moved(
+            bd.Location((cx + o + dx, tab_end, 5.0), down))
+    return body
 
 def chain_track(yg, side=None):
     """Brackets on both Y-roller motors and the angle across them. side "up": tabs up, angle on top
@@ -394,7 +414,7 @@ def chain_track(yg, side=None):
     side = side or P.get("chain_track_side", "back")
     Tm = compose(compose(at(0, yg), T_roll_y), T_mount)
     cx, cy, cz = apply(Tm, MOTOR_C)                     # left motor centre; shaft along X
-    x0 = cx + NEMA[1] / 2 - 11                           # bracket's outboard face, 1 mm off the motor end
+    x0 = cx + NEMA[1] / 2 - 10                           # ring on the rear end cap, flush with the motor end
     tab = (0, 0, 1) if side == "up" else (0, 1, 0)
     # X_b = Y_b x Z_b for a proper rotation; Z_b along the motor shaft (+X left, -X right)
     def cols(zb):
