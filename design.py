@@ -348,6 +348,45 @@ TAB_TOP = 69.4 - 21.2
 TRACK_COLOR = bd.Color(0.92, 0.92, 0.90)
 
 
+def place(shape, T, label, color):
+    """Place a B-rep shape with a proper transform T."""
+    R, t = T
+    plane = bd.Plane(origin=tuple(t), x_dir=(R[0][0], R[1][0], R[2][0]), z_dir=(R[0][2], R[1][2], R[2][2]))
+    s = shape.moved(bd.Location(plane))
+    s.label = label
+    s.color = color
+    return s
+
+
+def chain_bracket(tab_offset):
+    """Motor clamp bracket for the chain track, redrawn from nosilec_verige.stl (same frame and
+    sizes) with the tab - and its two M3 holes - moved tab_offset mm along Xb so they sit under
+    the angle. Ring 42.4 square inside (NEMA17), 5 wall, 10 thick; clamp ear with M3 screw and nut
+    pocket; tab 25 x 10, end face at Yb 69.4, M3 holes 10 apart, 7.3 deep."""
+    def octagon(x0, y0, x1, y1, c):
+        return bd.Polygon((x0 + c, y0), (x1 - c, y0), (x1, y0 + c), (x1, y1 - c),
+                          (x1 - c, y1), (x0 + c, y1), (x0, y1 - c), (x0, y0 + c), align=None)
+    o = tab_offset
+    ring = bd.extrude(octagon(-47.4, -5.0, 5.0, 47.4, 7.1), 10) - bd.extrude(octagon(-42.4, 0.0, 0.0, 42.4, 4.2), 10)
+    ear = bd.Box(12.0, 11.0, 10.0, align=(bd.Align.MIN, bd.Align.MIN, bd.Align.MIN)).moved(bd.Location((-57.4, 16.2, 0)))
+    tab = bd.Box(25.0, 69.4 - 42.4, 10.0, align=(bd.Align.MIN, bd.Align.MIN, bd.Align.MIN)).moved(
+        bd.Location((-33.7 + o, 42.4, 0)))
+    body = ring + ear + tab
+    # keep the tab out of the motor opening
+    body -= bd.extrude(octagon(-42.4, 0.0, 0.0, 42.4, 4.2), 10)
+    slit = bd.Box(15.0, 2.0, 10.0, align=(bd.Align.MIN, bd.Align.MIN, bd.Align.MIN)).moved(bd.Location((-57.4, 20.2, 0)))
+    pocket = bd.Box(11.0, 11.0, 10.0, align=(bd.Align.MIN, bd.Align.MIN, bd.Align.MIN)).moved(
+        bd.Location((-26.7 + o, 42.4, 0)))
+    ydir = (90, 0, 0)          # cylinder axis along -Y after this rotation; place by its centre
+    screw = bd.Cylinder(1.6, 11.0).moved(bd.Location((-52.39, 21.7, 5.0), ydir))
+    nut = bd.extrude(bd.RegularPolygon(3.23, 6), 2.2).moved(bd.Location((-52.39, 16.2 + 2.2, 5.0), ydir))
+    holes = [bd.Cylinder(1.6, 7.4, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MIN)).moved(
+        bd.Location((x + o, 69.4, 5.0), ydir)) for x in (-16.2, -26.2)]
+    for cut in (slit, pocket, screw, nut, *holes):
+        body -= cut
+    return body
+
+
 def chain_track(yg, side=None):
     """Brackets on both Y-roller motors and the angle across them. side "up": tabs up, angle on top
     as a tray (upright leg at the front). side "back": tabs pointing back (+Y), the angle's vertical
@@ -383,8 +422,14 @@ def chain_track(yg, side=None):
     for c in angle.children:
         c.color = TRACK_COLOR
     angle.color = TRACK_COLOR
-    return [part("chain_bracket", left, "Chain track bracket", A),
-            part("chain_bracket", right, "Chain track bracket", A), angle], length, zr
+    if side == "up":
+        o = P.get("chain_track_front", 1.0) + ANGLE[0] / 2          # tab centre under the angle
+        brackets = [place(chain_bracket(o), left, "Chain track bracket (left)", A),
+                    place(chain_bracket(-o), right, "Chain track bracket (right)", A)]
+    else:
+        brackets = [part("chain_bracket", left, "Chain track bracket", A),
+                    part("chain_bracket", right, "Chain track bracket", A)]
+    return [*brackets, angle], length, zr
 
 # ---- middle and Z axis, placed from bolt B (the middle's vertical tension bolt) ----
 RM = [(S2, -S2, 0), (S2, S2, 0), (0, 0, 1)]          # middle frame: front (-Ym) faces the 0,0 corner
@@ -512,3 +557,10 @@ model = bd.Compound(label="MPCNC Burly J", children=[
     bd.Compound(label="Middle", children=[part(n, T, l, c) for n, T, l, c in core]),
     bd.Compound(label="Z axis", children=[*(part(n, T, l, c) for n, T, l, c in zaxis), *zprims]),
 ])
+
+# Print files for the redrawn brackets: compile with "export_part": "chain_bracket_left" / "_right".
+_o = P.get("chain_track_front", 1.0) + ANGLE[0] / 2
+_exports = {"chain_bracket_left": lambda: chain_bracket(_o), "chain_bracket_right": lambda: chain_bracket(-_o)}
+if P.get("export_part") in _exports:
+    model = _exports[P["export_part"]]()
+    model.label = P["export_part"]
