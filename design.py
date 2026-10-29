@@ -452,8 +452,7 @@ def chain_track(yg, side=None):
         o = P.get("chain_track_front", 1.0) + ANGLE[0] / 2          # tab centre under the angle
         brackets = [place(chain_bracket(o), T, "Chain track bracket", A) for T in (left, right)]
     else:
-        brackets = [part("chain_bracket", left, "Chain track bracket", A),
-                    part("chain_bracket", right, "Chain track bracket", A)]
+        brackets = [place(chain_bracket(0.0), T, "Chain track bracket", A) for T in (left, right)]
     return [*brackets, angle], length, zr
 
 # ---- middle and Z axis, placed from bolt B (the middle's vertical tension bolt) ----
